@@ -1,46 +1,77 @@
 import { ShaderStruct } from '../shaders/Shader';
-import Shader from '../shaders/Shader';
+import { createUUID } from '../Utils';
 import Renderer from '../Renderer';
-import Geometry from '../geometries/Geometry';
-import { VERTICE_SIZE } from '../Constants';
+import Shader from '../shaders/Shader';
 import Instance from '../entities/Instance';
 import Camera from '../entities/Camera';
+import Geometry from '../geometries/Geometry';
 
-class Material {
-    private _shader             : Shader;
+abstract class Material {
+    protected _isOpaque                : boolean;
+    protected _renderBothFaces         : boolean;
+    protected _needsUpdate             : boolean;
+    protected _config                  : Array<string>;
+    protected _shader             : Shader;
+
+    public readonly id                 : string;
 
     constructor(shader: ShaderStruct) {
         this._shader = new Shader(shader);
-    }
-
-    private _renderGeometry(renderer: Renderer, geometry: Geometry): void {
-        const buffer = geometry.getBuffer(renderer),
-            program = this._shader.getProgram(renderer);
         
-        renderer.vertexAttribPointer(buffer.vertexBuffer, program.attributes["aVertexPosition"], VERTICE_SIZE);
+        this.id = createUUID();
+        this._isOpaque = true;
+        this._renderBothFaces = false;
+        this._needsUpdate = false;
+        this._config = [];
 
-        renderer.drawElements(buffer.indexBuffer, geometry.indexLength);
+        this._shader.includes = this._config;
     }
 
-    private _renderInstanceProperties(renderer: Renderer, instance: Instance, camera: Camera): void {
-        const gl = renderer.GL,
-            program = this._shader.getProgram(renderer);
+    public abstract render(renderer: Renderer, instance: Instance, geometry: Geometry, camera: Camera): void;
+    public abstract get isReady(): boolean;
 
-        gl.uniformMatrix4fv(program.uniforms["uProjection"], false, camera.projection.data);
-        gl.uniformMatrix4fv(program.uniforms["uPosition"], false, instance.worldMatrix.data);
+    public get isOpaque(): boolean {
+        return this._isOpaque;
     }
 
-    public render(renderer: Renderer, instance: Instance, geometry: Geometry, camera: Camera): Material {
-        this._shader.useProgram(renderer);
-
-        this._renderInstanceProperties(renderer, instance, camera);
-        this._renderGeometry(renderer, geometry);
+    public addConfig(configName: string): Material {
+        if (this._config.indexOf(configName) == -1) {
+            this._config.push(configName);
+            this._needsUpdate = true;
+        }
 
         return this;
     }
 
-    public get isReady(): boolean {
-        return true;
+    public removeConfig(configName: string): Material {
+        const ind = this._config.indexOf(configName);
+        if (ind != -1) {
+            this._config.splice(ind, 1);
+            this._needsUpdate = true;
+        }
+
+        return this;
+    }
+
+    public setOpaque(opaque: boolean): Material {
+        this._isOpaque = opaque;
+        return this;
+    }
+
+    public setCulling(bothFaces: boolean): Material {
+        this._renderBothFaces = bothFaces;
+        return this;
+    }
+
+    public destroy(): void {
+        this._shader.destroy();
+        
+        this._config = null;
+        this._shader = null;
+    }
+
+    public get shader(): Shader {
+        return this._shader;
     }
 }
 
