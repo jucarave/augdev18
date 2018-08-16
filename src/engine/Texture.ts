@@ -19,7 +19,6 @@ class Texture {
     private _ready             : boolean;
     private _textureMap        : RendererTextureMap;
     private _animations        : AnimationMap;
-    private _currentAnimation  : Animation2D;
 
     public readonly id         : string;
 
@@ -28,7 +27,6 @@ class Texture {
 
         this._textureMap = {};
         this._animations = {};
-        this._currentAnimation = null;
         this._ready = false;
         
         if ((<HTMLCanvasElement>src).getContext) {
@@ -126,14 +124,10 @@ class Texture {
         return animation;
     }
 
-    public playAnimation(code: string): void {
-        if (!this._animations[code]) { throw new Error("Animation [" + code + "] was not found!"); }
+    public getAnimation(code: string): Animation2D {
+        if (!this._animations[code]) { throw new Error("Animation [" + code + "] not found!"); }
 
-        this._currentAnimation = this._animations[code];
-    }
-
-    public get animation(): Animation2D {
-        return this._currentAnimation;
+        return this._animations[code];
     }
 
     public get isReady(): boolean {

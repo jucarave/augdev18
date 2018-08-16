@@ -3,40 +3,48 @@ import SpriteGeometry from './engine/geometries/SpriteGeometry';
 import Camera from './engine/entities/Camera';
 import Vector3 from './engine/math/Vector3';
 import Instance from './engine/entities/Instance';
-import Texture from './engine/Texture';
 import SpriteMaterial from './engine/materials/SpriteMaterial';
+import Scene from './engine/Scene';
+import DataManager from './DataManager';
 
 class App {
-    constructor() {
-        const renderer = new Renderer(854, 480);
-        renderer.addCanvasToElement(document.getElementById("divGame"));
+    private _renderer           : Renderer;
 
-        const geo = new SpriteGeometry(16, 16);
-        const tex = new Texture("img/character.png", () => {
-            this.loopGame(renderer, cam, inst);
+    constructor() {
+        this._renderer = new Renderer(960, 540);
+        this._renderer.addCanvasToElement(document.getElementById("divGame"));
+
+        DataManager.loadGameData(() => {
+            this._newGame();
         });
+    }
+
+    private _newGame(): void {
+        const geo = new SpriteGeometry(16, 16);
+        const tex = DataManager.getTexture("gunmanClassic");
         const mat = new SpriteMaterial(tex);
         const inst = new Instance(geo, mat);
 
-        const anim = tex.createAnimation("walkD");
-        anim.addFrame([0.00,0,0.25,0.25]);
-        anim.addFrame([0.25,0,0.25,0.25]);
-        anim.addFrame([0.50,0,0.25,0.25]);
-        anim.addFrame([0.75,0,0.25,0.25]);
-        anim.speed = 1 / 10;
-        tex.playAnimation("walkD");
+        mat.playAnimation("standR");
 
         const cam = Camera.createOrthographic(192, 108, 0.1, 100.0);
 
         cam.position.set(0, 0, 10);
         cam.rotation.lookToDirection(new Vector3(0, 0, -10.0));
+
+        const scene = new Scene();
+        scene.addInstance(inst);
+
+        this._loopGame(cam, scene);
     }
 
-    loopGame(renderer: Renderer, cam: Camera, inst: Instance) {
-        renderer.clearCanvas(0.5, 0.5, 0.5);
-        inst.render(renderer, cam);
+    private _loopGame(cam: Camera, scene: Scene): void {
+        const renderer = this._renderer;
 
-        requestAnimationFrame(() => { this.loopGame(renderer, cam, inst); })
+        renderer.clearCanvas(0.5, 0.5, 0.5);
+        scene.render(renderer, cam);
+
+        requestAnimationFrame(() => { this._loopGame(cam, scene); })
     }
 }
 

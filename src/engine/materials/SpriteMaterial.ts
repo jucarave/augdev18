@@ -11,6 +11,9 @@ class SpriteMaterial extends Material {
     private _texture             : Texture;
     private _uvs                 : Array<number>;
     private _repeat              : Array<number>;
+
+    private _frameIndex          : number;
+    private _animationIndex      : string;
     
     constructor(texture: Texture) {
         super(MainShader);
@@ -18,6 +21,8 @@ class SpriteMaterial extends Material {
         this._texture = texture;
         this._uvs = [0, 0, 1, 1];
         this._repeat = [1, 1];
+        this._frameIndex = 0;
+        this._animationIndex = "";
 
         this.addConfig("USE_TEXTURE");
     }
@@ -43,11 +48,10 @@ class SpriteMaterial extends Material {
     private _renderTexture(renderer: Renderer): void {
         const gl = renderer.GL,
             program = this._shader.getProgram(renderer),
-            animation = this._texture.animation;
+            animation = this._texture.getAnimation(this._animationIndex);
 
         if (animation) {
-            animation.update();
-            gl.uniform4fv(program.uniforms["uUV"], animation.getCurrentFrame());
+            gl.uniform4fv(program.uniforms["uUV"], animation.getFrame(this._frameIndex));
         }else {
             gl.uniform4fv(program.uniforms["uUV"], this._uvs);
         }
@@ -57,12 +61,34 @@ class SpriteMaterial extends Material {
         renderer.bindTexture(this._texture, "baseTexture", program.uniforms["uTexture"]);
     }
 
+    private _updateAnimation(): void {
+        const animation = this._texture.getAnimation(this._animationIndex);
+
+        this._frameIndex += animation.speed;
+        if (this._frameIndex >= animation.length) {
+            this._frameIndex = 0;
+        }
+    }
+
+    public playAnimation(animationIndex: string): void {
+        this._texture.getAnimation(animationIndex);
+
+        this._animationIndex = animationIndex;
+        this._frameIndex = 0;
+    }
+
     public render(renderer: Renderer, instance: Instance, geometry: Geometry, camera: Camera): void {
         this._shader.useProgram(renderer);
+
+        this._updateAnimation();
 
         this._renderInstanceProperties(renderer, instance, camera);
         this._renderTexture(renderer);
         this._renderGeometry(renderer, geometry);
+    }
+
+    public get texture(): Texture {
+        return this._texture;
     }
 
     public set uvs(uvs: Array<number>) {

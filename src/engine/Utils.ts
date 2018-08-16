@@ -1,3 +1,5 @@
+import Texture from "./Texture";
+
 export function createUUID(): string {
     let date = (new Date()).getTime(),
         ret = ('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx').replace(/[xy]/g, (c: string): string => {
@@ -31,4 +33,16 @@ export function loadJSON(url: string, callback: Function): void {
     httpRequest(url, (responseText: string) => {
         callback(JSON.parse(responseText));
     });
+}
+
+export function waitTexturesToLoad(textures: Array<Texture>, callback: Function) {
+    for (let i=0,tex:Texture;tex=textures[i];i++) {
+        if (!tex.isReady) {
+            return requestAnimationFrame(() => {
+                waitTexturesToLoad(textures, callback);
+            })
+        }
+    }
+
+    callback();
 }

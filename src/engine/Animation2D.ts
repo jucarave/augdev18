@@ -1,14 +1,11 @@
 class Animation2D {
     private _frames             : Array<Array<number>>;
-    private _frameIndex         : number;
 
     public speed                : number;
 
     constructor() {
         this._frames = [];
-        this._frameIndex = 0;
-
-        this.speed = 1;
+        this.speed = 1.0;
     }
 
     public addFrame(uvs: Array<number>): Animation2D {
@@ -17,16 +14,12 @@ class Animation2D {
         return this;
     }
 
-    public getCurrentFrame(): Array<number> {
-        return this._frames[this._frameIndex << 0];
+    public getFrame(frameIndex: number): Array<number> {
+        return this._frames[frameIndex << 0];
     }
 
-    public update(): void {
-        this._frameIndex += this.speed;
-
-        if (this._frameIndex >= this._frames.length) {
-            this._frameIndex = 0;
-        }
+    public get length(): number {
+        return this._frames.length;
     }
 }
 

@@ -1,0 +1,14 @@
+{
+    "characters": {
+        "gunmanClassic": {
+            "spriteIndex": "img/character.png",
+            "code": "gunmanClassic",
+            "animations": {
+                "standD": [[0,0,16,16]],
+                "standR": [[0,16,16,16]],
+                "standL": [[0,32,16,16]],
+                "standU": [[0,48,16,16]]
+            }
+        }
+    }
+}

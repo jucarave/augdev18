@@ -67,6 +67,9 @@ class Instance {
         return this._transform;
     }
 
+    public update(): void {
+    }
+
     public render(renderer: Renderer, camera: Camera): void {
         if (!this._geometry || !this._material) { return; }
         if (!this._material.isReady) { return; }
