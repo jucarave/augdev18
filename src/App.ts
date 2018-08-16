@@ -6,6 +6,7 @@ import Instance from './engine/entities/Instance';
 import SpriteMaterial from './engine/materials/SpriteMaterial';
 import Scene from './engine/Scene';
 import DataManager from './DataManager';
+import PlayerComponent from './components/PlayerComponent';
 
 class App {
     private _renderer           : Renderer;
@@ -24,6 +25,8 @@ class App {
         const tex = DataManager.getTexture("gunmanClassic");
         const mat = new SpriteMaterial(tex);
         const inst = new Instance(geo, mat);
+
+        inst.addComponent(new PlayerComponent());
 
         mat.playAnimation("standR");
 

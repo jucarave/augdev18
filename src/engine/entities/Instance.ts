@@ -7,6 +7,7 @@ import Vector3 from '../math/Vector3';
 import Vector4 from '../math/Vector4';
 import Quaternion from '../math/Quaternion';
 import { createUUID } from '../Utils';
+import Component from '../Component';
 
 class Instance {
     protected _geometry           : Geometry;
@@ -18,6 +19,7 @@ class Instance {
     protected _parent             : Instance;
     protected _children           : Array<Instance>
     protected _globalPosition     : Vector4;
+    protected _components         : Array<Component>;
 
     public readonly id                  : string;
     public readonly position            : Vector3;
@@ -33,6 +35,7 @@ class Instance {
         this._geometry = geometry;
         this._material = material;
         this._children = [];
+        this._components = [];
         this._parent = null;
         this._destroyed = false;
         this._globalPosition = new Vector4(0.0, 0.0, 0.0, 0.0);
@@ -67,7 +70,56 @@ class Instance {
         return this._transform;
     }
 
+    public addComponent(component: Component): Instance {
+        this._components.push(component);
+
+        component.setInstance(this);
+
+        return this;
+    }
+
+    public getComponent(code: string): Component {
+        for (let i=0,comp:Component;comp=this._components[i];i++) {
+            if (comp.code == code) {
+                return comp;
+            }
+        }
+
+        return null;
+    }
+
+    public init(): void {
+        for (let i=0,comp:Component;comp=this._components[i];i++) {
+            comp.init();
+        }
+    }
+
     public update(): void {
+        for (let i=0,comp:Component;comp=this._components[i];i++) {
+            comp.update();
+        }
+    }
+
+    public destroy(): void {
+        for (let i=0,comp:Component;comp=this._components[i];i++) {
+            comp.destroy();
+        }
+
+        for (let i=0,child:Instance;child=this._children[i];i++) {
+            child.destroy();
+        }
+
+        this._components = null;
+        this._transform = null;
+        this._worldMatrix = null;
+        this._needsUpdate = true;
+        this._geometry = null;
+        this._material = null;
+        this._children = null;
+        this._components = null;
+        this._parent = null;
+        this._globalPosition = null;
+        this._destroyed = true;
     }
 
     public render(renderer: Renderer, camera: Camera): void {

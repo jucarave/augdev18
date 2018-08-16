@@ -87,10 +87,6 @@ class SpriteMaterial extends Material {
         this._renderGeometry(renderer, geometry);
     }
 
-    public get texture(): Texture {
-        return this._texture;
-    }
-
     public set uvs(uvs: Array<number>) {
         this._uvs = uvs;
     }

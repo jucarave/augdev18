@@ -24,6 +24,12 @@ class Scene {
         }
 
         for (i=0;ins=this._instances[i];i++) {
+            if (ins.isDestroyed) {
+                this._instances.splice(i, 1);
+                i -= 1;
+                continue;
+            }
+            
             ins.render(renderer, camera);
         }
 
