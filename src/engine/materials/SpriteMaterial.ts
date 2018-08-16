@@ -71,6 +71,8 @@ class SpriteMaterial extends Material {
     }
 
     public playAnimation(animationIndex: string): void {
+        if (this._animationIndex == animationIndex) { return; }
+        
         this._texture.getAnimation(animationIndex);
 
         this._animationIndex = animationIndex;

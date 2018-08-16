@@ -38,6 +38,8 @@ class App {
         const scene = new Scene();
         scene.addInstance(inst);
 
+        scene.init();
+
         this._loopGame(cam, scene);
     }
 

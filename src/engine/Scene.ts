@@ -15,6 +15,14 @@ class Scene {
         return this;
     }
 
+    public init(): Scene {
+        for (let i=0,ins:Instance;ins=this._instances[i];i++) {
+            ins.init();
+        }
+
+        return this;
+    }
+
     public render(renderer: Renderer, camera: Camera): Scene {
         let i: number,
             ins: Instance;
@@ -29,7 +37,7 @@ class Scene {
                 i -= 1;
                 continue;
             }
-            
+
             ins.render(renderer, camera);
         }
 

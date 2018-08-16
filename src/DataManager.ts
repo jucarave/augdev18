@@ -19,7 +19,8 @@ class DataManager {
             const anim = tex.createAnimation(j),
                 frames = animationsData[j];
 
-            for (let k=0,frame;frame=frames[k];k++) {
+            anim.speed = frames[0];
+            for (let k=1,frame;frame=frames[k];k++) {
                 anim.addFrame([
                     frame[0] / tex.width,
                     frame[1] / tex.height,
