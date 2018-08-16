@@ -1,9 +1,14 @@
 import Renderer from './Renderer';
 import Vector4 from './math/Vector4';
 import {createUUID } from './Utils';
+import Animation2D from './Animation2D';
 
 interface RendererTextureMap {
     [index: string]             : WebGLTexture;
+}
+
+interface AnimationMap {
+    [index: string]             : Animation2D;
 }
 
 class Texture {
@@ -13,6 +18,8 @@ class Texture {
     private _imageData         : ImageData;
     private _ready             : boolean;
     private _textureMap        : RendererTextureMap;
+    private _animations        : AnimationMap;
+    private _currentAnimation  : Animation2D;
 
     public readonly id         : string;
 
@@ -20,6 +27,8 @@ class Texture {
         this.id = createUUID();
 
         this._textureMap = {};
+        this._animations = {};
+        this._currentAnimation = null;
         this._ready = false;
         
         if ((<HTMLCanvasElement>src).getContext) {
@@ -108,6 +117,23 @@ class Texture {
         this._imageData.data[ind + 3] = color.w;
 
         return this;
+    }
+
+    public createAnimation(code: string): Animation2D {
+        const animation = new Animation2D();
+        this._animations[code] = animation;
+
+        return animation;
+    }
+
+    public playAnimation(code: string): void {
+        if (!this._animations[code]) { throw new Error("Animation [" + code + "] was not found!"); }
+
+        this._currentAnimation = this._animations[code];
+    }
+
+    public get animation(): Animation2D {
+        return this._currentAnimation;
     }
 
     public get isReady(): boolean {

@@ -42,9 +42,16 @@ class SpriteMaterial extends Material {
 
     private _renderTexture(renderer: Renderer): void {
         const gl = renderer.GL,
-            program = this._shader.getProgram(renderer);
+            program = this._shader.getProgram(renderer),
+            animation = this._texture.animation;
 
-        gl.uniform4fv(program.uniforms["uUV"], this._uvs);
+        if (animation) {
+            animation.update();
+            gl.uniform4fv(program.uniforms["uUV"], animation.getCurrentFrame());
+        }else {
+            gl.uniform4fv(program.uniforms["uUV"], this._uvs);
+        }
+
         gl.uniform2fv(program.uniforms["uRepeat"], this._repeat);
         
         renderer.bindTexture(this._texture, "baseTexture", program.uniforms["uTexture"]);
