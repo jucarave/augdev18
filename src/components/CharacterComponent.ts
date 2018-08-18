@@ -1,21 +1,20 @@
 import Component from "../engine/Component";
-import Instance from "../engine/entities/Instance";
-import SpriteGeometry from "../engine/geometries/SpriteGeometry";
-import DataManager from "../DataManager";
+import DataManager from "../managers/DataManager";
 import SpriteMaterial from "../engine/materials/SpriteMaterial";
-import Scene from "../engine/Scene";
+import Renderer from "../engine/Renderer";
+import Geometry from "../engine/geometries/Geometry";
+import Camera from "../engine/entities/Camera";
 
 type Face = 'D' | 'R' | 'L' | 'U';
+type Action = 'stand' | 'walk';
 
 class CharacterComponent extends Component {
     private _material                   : SpriteMaterial;
     private _characterCode              : string;
     private _clothMat                   : SpriteMaterial;
-    private _clothInst                  : Instance;
     private _clothCode                  : string;
-    private _action                     : string;
+    private _action                     : Action;
     private _face                       : Face;
-    private _scene                      : Scene;
 
     public keys = {
         UP: 0,
@@ -38,15 +37,10 @@ class CharacterComponent extends Component {
     }
 
     private _createCloths(): void {
-        const geo = new SpriteGeometry(16, 16);
         const tex = DataManager.getTexture("characters");
         const mat = new SpriteMaterial(tex);
-        const inst = new Instance(geo, mat);
-
-        inst.visible = false;
 
         this._clothMat = mat;
-        this._clothInst = inst;
     }
 
     private _getFacingDirection(hor: number, ver: number): string {
@@ -83,13 +77,8 @@ class CharacterComponent extends Component {
         this._getFacingDirection(x, y);
     }
 
-    public init(scene: Scene): void {
+    public init(): void {
         this._material = <SpriteMaterial>this._instance.material;
-
-        this._scene = scene;
-
-        this._instance.addChild(this._clothInst);
-        this._scene.addInstance(this._clothInst);
     }
 
     public update(): void {
@@ -104,10 +93,13 @@ class CharacterComponent extends Component {
         }
     }
 
+    public render(renderer: Renderer, geometry: Geometry, camera: Camera): void {
+        if (!this._clothCode) { return; }
+        this._clothMat.render(renderer, this._instance, geometry, camera);
+    }
+
     public set cloth(clothCode: string) {
         this._clothCode = clothCode;
-
-        this._clothInst.visible = (clothCode !== null);
     }
 }
 

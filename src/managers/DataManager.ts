@@ -1,5 +1,5 @@
-import Texture from "./engine/Texture";
-import { waitTexturesToLoad, loadJSON } from "./engine/Utils";
+import Texture from "../engine/Texture";
+import { waitTexturesToLoad, loadJSON } from "../engine/Utils";
 
 interface TexturesMap {
     [index: string]             : number;
@@ -61,7 +61,7 @@ class DataManager {
                     const chara = charactersData[i],
                         ind = loadedSprites.indexOf(chara.spriteIndex);
     
-                    this._parseAnimations(this._textures[ind], chara.code, chara.animations);
+                    this._parseAnimations(this._textures[ind], i, chara.animations);
 
                     const spriteCode = chara.spriteIndex.replace("img/", "").replace(".png", "");
 

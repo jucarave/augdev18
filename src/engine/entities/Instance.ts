@@ -144,6 +144,10 @@ class Instance {
         this._worldMatrix.multiply(camera.getViewMatrix());
 
         this._material.render(renderer, this, this._geometry, camera);
+
+        for (let i=0,comp:Component;comp=this._components[i];i++) {
+            comp.render(renderer, this._geometry, camera);
+        }
     }
 
     public addChild(instance: Instance): void {
@@ -177,6 +181,10 @@ class Instance {
 
         this._parent.removeChild(this);
         this._parent = null;
+    }
+
+    public isParent(ins: Instance): boolean {
+        return ins === this._parent;
     }
 
     public get worldMatrix(): Matrix4 {
