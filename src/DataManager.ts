@@ -14,18 +14,23 @@ class DataManager {
         this._texturesByCode = {};
     }
 
-    private _parseAnimations(tex: Texture, animationsData: any) {
+    private _parseAnimations(tex: Texture, code: string, animationsData: any) {
+        const spriteSize = 16;
+        
         for (let j in animationsData) {
-            const anim = tex.createAnimation(j),
+            const anim = tex.createAnimation(code + j),
                 frames = animationsData[j];
 
             anim.speed = frames[0];
             for (let k=1,frame;frame=frames[k];k++) {
+                const x = frame[0] * spriteSize,
+                    y = frame[1] * spriteSize;
+
                 anim.addFrame([
-                    frame[0] / tex.width,
-                    frame[1] / tex.height,
-                    frame[2] / tex.width,
-                    frame[3] / tex.height
+                    x / tex.width,
+                    y / tex.height,
+                    spriteSize / tex.width,
+                    spriteSize / tex.height
                 ]);
             }
         }
@@ -39,6 +44,7 @@ class DataManager {
             this._textures = [];
 
             for (let i in charactersData) {
+
                 const chara = charactersData[i],
                     ind = loadedSprites.indexOf(chara.spriteIndex);
 
@@ -55,10 +61,12 @@ class DataManager {
                     const chara = charactersData[i],
                         ind = loadedSprites.indexOf(chara.spriteIndex);
     
-                    this._parseAnimations(this._textures[ind], chara.animations);
+                    this._parseAnimations(this._textures[ind], chara.code, chara.animations);
 
-                    if (this._texturesByCode[chara.code] === undefined) {
-                        this._texturesByCode[chara.code] = ind;
+                    const spriteCode = chara.spriteIndex.replace("img/", "").replace(".png", "");
+
+                    if (this._texturesByCode[spriteCode] === undefined) {
+                        this._texturesByCode[spriteCode] = ind;
                     }
                 }
 

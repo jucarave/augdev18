@@ -8,6 +8,7 @@ import Vector4 from '../math/Vector4';
 import Quaternion from '../math/Quaternion';
 import { createUUID } from '../Utils';
 import Component from '../Component';
+import Scene from '../Scene';
 
 class Instance {
     protected _geometry           : Geometry;
@@ -20,6 +21,9 @@ class Instance {
     protected _children           : Array<Instance>
     protected _globalPosition     : Vector4;
     protected _components         : Array<Component>;
+    protected _scene              : Scene;
+
+    public visible                : boolean;
 
     public readonly id                  : string;
     public readonly position            : Vector3;
@@ -40,6 +44,8 @@ class Instance {
         this._destroyed = false;
         this._globalPosition = new Vector4(0.0, 0.0, 0.0, 0.0);
 
+        this.visible = true;
+
         this.position = new Vector3(0.0);
         this.position.onChange = () => this.emmitNeedsUpdate();
 
@@ -59,7 +65,7 @@ class Instance {
 
         this._transform.multiply(this.rotation.getRotationMatrix());
 
-        this._transform.translate(this.position.x, this.position.y, this.position.z);
+        this._transform.translate(this.position.x << 0, this.position.y << 0, this.position.z << 0);
 
         if (this._parent) {
             this._transform.multiply(this._parent.getTransformation());
@@ -70,6 +76,12 @@ class Instance {
         return this._transform;
     }
 
+    public setScene(scene: Scene): Instance {
+        this._scene = scene;
+
+        return this;
+    }
+
     public addComponent(component: Component): Instance {
         this._components.push(component);
 
@@ -78,10 +90,10 @@ class Instance {
         return this;
     }
 
-    public getComponent(code: string): Component {
+    public getComponent<T>(code: string): T {
         for (let i=0,comp:Component;comp=this._components[i];i++) {
             if (comp.code == code) {
-                return comp;
+                return <T>(<any>comp);
             }
         }
 
@@ -90,7 +102,7 @@ class Instance {
 
     public init(): void {
         for (let i=0,comp:Component;comp=this._components[i];i++) {
-            comp.init();
+            comp.init(this._scene);
         }
     }
 
@@ -123,6 +135,8 @@ class Instance {
     }
 
     public render(renderer: Renderer, camera: Camera): void {
+        if (!this.visible) { return; }
+
         if (!this._geometry || !this._material) { return; }
         if (!this._material.isReady) { return; }
 

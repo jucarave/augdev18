@@ -11,6 +11,7 @@ class Scene {
 
     public addInstance(instance: Instance): Scene {
         this._instances.push(instance);
+        instance.setScene(this);
 
         return this;
     }

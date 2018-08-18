@@ -7,6 +7,7 @@ import SpriteMaterial from './engine/materials/SpriteMaterial';
 import Scene from './engine/Scene';
 import DataManager from './DataManager';
 import PlayerComponent from './components/PlayerComponent';
+import CharacterComponent from './components/CharacterComponent';
 
 class App {
     private _renderer           : Renderer;
@@ -22,13 +23,15 @@ class App {
 
     private _newGame(): void {
         const geo = new SpriteGeometry(16, 16);
-        const tex = DataManager.getTexture("gunmanClassic");
+        const tex = DataManager.getTexture("characters");
         const mat = new SpriteMaterial(tex);
         const inst = new Instance(geo, mat);
+        
+        const characterComponent = new CharacterComponent("gunman");
+        characterComponent.cloth = "classicCloth";
 
+        inst.addComponent(characterComponent);
         inst.addComponent(new PlayerComponent());
-
-        mat.playAnimation("standR");
 
         const cam = Camera.createOrthographic(192, 108, 0.1, 100.0);
 

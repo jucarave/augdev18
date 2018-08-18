@@ -1,4 +1,5 @@
 import Instance from "./entities/Instance";
+import Scene from "./Scene";
 
 abstract class Component {
     protected _instance         : Instance;
@@ -9,7 +10,7 @@ abstract class Component {
         this.code = code;
     }
 
-    public init(): void {}
+    public init(scene: Scene): void { scene; }
     public update(): void {}
     public destroy(): void {}
 
