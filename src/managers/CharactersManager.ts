@@ -5,6 +5,7 @@ import Instance from "../engine/entities/Instance";
 import CharacterComponent from "../components/CharacterComponent";
 import PlayerComponent from "../components/PlayerComponent";
 import BoxCollision from "../engine/collisions/BoxCollision";
+import Knife from "../weapons/Knife";
 
 class CharactersManager {
     private _createCharacter(code: string, cloth: string): Instance {
@@ -26,6 +27,12 @@ class CharactersManager {
         const inst = this._createCharacter("gunman", cloth);
 
         inst.addComponent(new PlayerComponent());
+
+        const characterComponent = inst.getComponent<CharacterComponent>(CharacterComponent.COMPONENT_NAME),
+            knife = new Knife();
+
+        characterComponent.addWeapon(knife);
+        characterComponent.equipWeapon(knife);
 
         return inst;
     }

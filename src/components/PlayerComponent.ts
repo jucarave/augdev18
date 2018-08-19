@@ -2,7 +2,7 @@ import Component from "../engine/Component";
 import Input, { Callback } from "../engine/Input";
 import CharacterComponent from "./CharacterComponent";
 
-type KEYS = 'UP' | 'LEFT' | 'DOWN' | 'RIGHT';
+type KEYS = 'UP' | 'LEFT' | 'DOWN' | 'RIGHT' | 'ATTACK';
 
 class PlayerComponent extends Component {
     private _callbacks                  : Array<Callback>;
@@ -20,11 +20,14 @@ class PlayerComponent extends Component {
         if (keyCode == 65) { return 'LEFT'; } else 
         if (keyCode == 87) { return 'UP'; } else 
         if (keyCode == 68) { return 'RIGHT'; } else 
-        if (keyCode == 83) { return 'DOWN'; }
+        if (keyCode == 83) { return 'DOWN'; } else
+        if (keyCode == 75) { return 'ATTACK'; }
     }
 
     private _handleKeydown(ev: KeyboardEvent): void {
         const key = this._keycodeToName(ev.keyCode);
+        if (this._characterComponent.keys[key] == 2) { return; }
+
         this._characterComponent.keys[key] = 1;
     }
 
