@@ -11,7 +11,7 @@ class BoxCollision {
     public readonly y2              : number;
     public readonly instance               : Instance;
 
-    constructor(instance: Instance, width: number, height: number, pivot: Pivot) {
+    constructor(instance: Instance, width: number, height: number, pivot: Pivot = 'M') {
         this.id = createUUID();
 
         this.instance = instance;

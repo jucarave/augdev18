@@ -21,6 +21,8 @@ class CharacterComponent extends Component {
     private _weapons                    : Array<Weapon>;
     private _currentWeapon              : Weapon;
     private _actionBusy                 : number;
+    
+    private _health                     : number;
 
     public keys = {
         UP: 0,
@@ -42,6 +44,8 @@ class CharacterComponent extends Component {
         this._weapons = [];
         this._currentWeapon = null;
         this._actionBusy = 0;
+
+        this._health = 5;
 
         this._createCloths();
     }
@@ -86,7 +90,7 @@ class CharacterComponent extends Component {
         }
 
         this._instance.position.add(x, y, 0);
-        if (this._scene.isCollision(this._instance)) {
+        if (this._scene.getCollision(this._instance)) {
             this._instance.position.add(-x, -y, 0);
             this._action = "stand";
         }
@@ -99,8 +103,14 @@ class CharacterComponent extends Component {
         if (!this._currentWeapon) { return; }
 
         if (this.keys.ATTACK == 1) {
+            let x = this._instance.position.x,
+                y = this._instance.position.y;
+
+            if (this._face == "R") { x += 16; } else if (this._face == "L") { x -= 16; }
+            if (this._face == "U") { y += 8; } else if (this._face == "D") { y -= 4; }
+
             this._action = "attack";
-            this._currentWeapon.attack(this._instance);
+            this._currentWeapon.attack(this._scene, x, y);
             
             this._actionBusy = 15;
 
@@ -112,6 +122,20 @@ class CharacterComponent extends Component {
 
     public addWeapon(weapon: Weapon): void {
         this._weapons.push(weapon);
+    }
+
+    public addDamage(damage: number): void {
+        this._health -= damage;
+
+        if (this._health < 0) {
+            this._instance.collision = null;
+
+            this._material.playAnimation(this._characterCode + "dead");
+
+            if (this._clothCode) {
+                this._clothMat.playAnimation(this._clothCode + "dead");
+            }
+        }
     }
 
     public equipWeapon(weapon: Weapon): void {
@@ -126,6 +150,7 @@ class CharacterComponent extends Component {
     public update(): void {
         super.update();
 
+        if (this._health < 0) { return; }
         if (this._actionBusy > 0) { this._actionBusy -= 1; }
 
         this._updateAttack();
@@ -149,6 +174,10 @@ class CharacterComponent extends Component {
 
     public get weapons(): Array<Weapon> {
         return this._weapons;
+    }
+
+    public get face(): Face {
+        return this._face;
     }
 }
 

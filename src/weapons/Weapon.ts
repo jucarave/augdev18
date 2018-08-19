@@ -1,4 +1,4 @@
-import Instance from "../engine/entities/Instance";
+import Scene from "../engine/Scene";
 
 abstract class Weapon {
     public continousAttack          : boolean;
@@ -7,7 +7,7 @@ abstract class Weapon {
         this.continousAttack = true;
     }
 
-    public abstract attack(instance: Instance): void;
+    public abstract attack(scene: Scene, bulletX: number, bulletY: number): void;
 }
 
 export default Weapon;
