@@ -22,7 +22,7 @@ class SpriteMaterial extends Material {
         this._uvs = [0, 0, 1, 1];
         this._repeat = [1, 1];
         this._frameIndex = 0;
-        this._animationIndex = "";
+        this._animationIndex = null;
 
         this.addConfig("USE_TEXTURE");
     }
@@ -48,7 +48,7 @@ class SpriteMaterial extends Material {
     private _renderTexture(renderer: Renderer): void {
         const gl = renderer.GL,
             program = this._shader.getProgram(renderer),
-            animation = this._texture.getAnimation(this._animationIndex);
+            animation = (this._animationIndex)? this._texture.getAnimation(this._animationIndex) : null;
 
         if (animation) {
             gl.uniform4fv(program.uniforms["uUV"], animation.getFrame(this._frameIndex));
@@ -62,6 +62,8 @@ class SpriteMaterial extends Material {
     }
 
     private _updateAnimation(): void {
+        if (!this._animationIndex) { return; }
+
         const animation = this._texture.getAnimation(this._animationIndex);
 
         this._frameIndex += animation.speed;

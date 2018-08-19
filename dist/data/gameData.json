@@ -1,4 +1,8 @@
 {
+    "levels": [
+        "img/level1.png"
+    ],
+    
     "characters": {
         "gunman": {
             "spriteIndex": "img/characters.png",

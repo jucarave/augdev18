@@ -1,11 +1,6 @@
 import Renderer from './engine/Renderer';
-import Camera from './engine/entities/Camera';
-import Vector3 from './engine/math/Vector3';
-import Scene from './engine/Scene';
 import DataManager from './managers/DataManager';
-import CharactersManager from './managers/CharactersManager';
-import Instance from './engine/entities/Instance';
-import List from './engine/List';
+import Level1 from './levels/Level1';
 
 class App {
     private _renderer           : Renderer;
@@ -20,45 +15,20 @@ class App {
     }
 
     private _newGame(): void {
-        const cam = Camera.createOrthographic(192, 108, 0.1, 100.0);
+        const level1 = new Level1();
 
-        cam.position.set(0, 0, 10);
-        cam.rotation.lookToDirection(new Vector3(0, 0, -10.0));
+        level1.init();
 
-        const scene = new Scene();
-
-        const inst = CharactersManager.createGunman();
-        scene.addInstance(inst);
-
-        const civ = CharactersManager.createCivilian();
-        civ.position.x = 80;
-        civ.position.y = 32;
-        scene.addInstance(civ);
-
-        scene.init();
-
-        scene.beforeRender = (instances: List<Instance>) => {
-            
-            instances.sort((insA: Instance, insB: Instance) => {
-                const depthA = insA.globalPosition,
-                    depthB = insB.globalPosition;
-
-                return depthA.y-depthA.z > depthB.y-depthB.z;
-            });
-
-            return instances;
-        };
-
-        this._loopGame(cam, scene);
+        this._loopGame(level1);
     }
 
-    private _loopGame(cam: Camera, scene: Scene): void {
+    private _loopGame(level: Level1): void {
         const renderer = this._renderer;
 
         renderer.clearCanvas(0.5, 0.5, 0.5);
-        scene.render(renderer, cam);
+        level.render(this._renderer);
 
-        requestAnimationFrame(() => { this._loopGame(cam, scene); })
+        requestAnimationFrame(() => { this._loopGame(level); })
     }
 }
 
