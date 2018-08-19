@@ -4,11 +4,13 @@ import SpriteMaterial from "../engine/materials/SpriteMaterial";
 import Renderer from "../engine/Renderer";
 import Geometry from "../engine/geometries/Geometry";
 import Camera from "../engine/entities/Camera";
+import Scene from "../engine/Scene";
 
 type Face = 'D' | 'R' | 'L' | 'U';
 type Action = 'stand' | 'walk';
 
 class CharacterComponent extends Component {
+    private _scene                      : Scene;
     private _material                   : SpriteMaterial;
     private _characterCode              : string;
     private _clothMat                   : SpriteMaterial;
@@ -74,10 +76,16 @@ class CharacterComponent extends Component {
         }
 
         this._instance.position.add(x, y, 0);
+        if (this._scene.isCollision(this._instance)) {
+            this._instance.position.add(-x, -y, 0);
+            this._action = "stand";
+        }
+
         this._getFacingDirection(x, y);
     }
 
-    public init(): void {
+    public init(scene: Scene): void {
+        this._scene = scene;
         this._material = <SpriteMaterial>this._instance.material;
     }
 

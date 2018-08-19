@@ -9,6 +9,7 @@ import Quaternion from '../math/Quaternion';
 import { createUUID } from '../Utils';
 import Component from '../Component';
 import Scene from '../Scene';
+import BoxCollision from '../collisions/BoxCollision';
 
 class Instance {
     protected _geometry           : Geometry;
@@ -24,6 +25,7 @@ class Instance {
     protected _scene              : Scene;
 
     public visible                : boolean;
+    public collision              : BoxCollision;
 
     public readonly id                  : string;
     public readonly position            : Vector3;
@@ -45,6 +47,7 @@ class Instance {
         this._globalPosition = new Vector4(0.0, 0.0, 0.0, 0.0);
 
         this.visible = true;
+        this.collision = null;
 
         this.position = new Vector3(0.0);
         this.position.onChange = () => this.emmitNeedsUpdate();

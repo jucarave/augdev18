@@ -4,6 +4,7 @@ import SpriteMaterial from "../engine/materials/SpriteMaterial";
 import Instance from "../engine/entities/Instance";
 import CharacterComponent from "../components/CharacterComponent";
 import PlayerComponent from "../components/PlayerComponent";
+import BoxCollision from "../engine/collisions/BoxCollision";
 
 class CharactersManager {
     private _createCharacter(code: string, cloth: string): Instance {
@@ -11,6 +12,8 @@ class CharactersManager {
         const tex = DataManager.getTexture("characters");
         const mat = new SpriteMaterial(tex);
         const inst = new Instance(geo, mat);
+
+        inst.collision = new BoxCollision(inst, 10, 4, 'BM');
         
         const characterComponent = new CharacterComponent(code);
         characterComponent.cloth = cloth;

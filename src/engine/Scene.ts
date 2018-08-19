@@ -21,6 +21,19 @@ class Scene {
         return this;
     }
 
+    public isCollision(instance: Instance): boolean {
+        let node = this._instances.head;
+
+        while (node) {
+            const inst: Instance = node.item;
+            if (inst.id !== instance.id && inst.collision && inst.collision.overlaps(instance.collision)) {
+                return true;
+            }
+
+            node = node.next;
+        }
+    }
+
     public init(): Scene {
         this._instances.each((ins: Instance) => {
             ins.init();
