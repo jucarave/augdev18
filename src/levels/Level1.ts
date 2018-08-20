@@ -8,22 +8,19 @@ import Renderer from "../engine/Renderer";
 import CharactersManager from "../managers/CharactersManager";
 import List from "../engine/List";
 import Vector3 from "../engine/math/Vector3";
+import CameraComponent from "../components/CameraComponent";
 
 class Level1 {
     private _scene              : Scene;
     private _camera             : Camera;
+    private _player             : Instance;
 
     constructor() {
         this._scene = new Scene();
-        this._camera = Camera.createOrthographic(192, 108, 0.1, 100.0);
-
-        this._camera.position.set(96, 54, 10);
-        this._camera.rotation.lookToDirection(new Vector3(0, 0, -10.0));
-
-        this._scene.addCamera(0, this._camera);
 
         this._buildLevelGeometry();
         this._populate();
+        this._createCamera();
 
         this._scene.beforeRender = (instances: List<Instance>, layer: number) => {
             if (layer != 1) { return instances; }
@@ -39,9 +36,21 @@ class Level1 {
         };
     }
 
+    private _createCamera(): void {
+        this._camera = Camera.createOrthographic(192, 108, 0.1, 100.0);
+
+        const cameraComponent = new CameraComponent(this._player);
+        this._camera.addComponent(cameraComponent);
+
+        this._camera.position.set(96, 54, 10);
+        this._camera.rotation.lookToDirection(new Vector3(0, 0, -10.0));
+
+        this._scene.addCamera(0, this._camera);
+    }
+
     private _buildLevelGeometry(): void {
-        const geo = new SpriteGeometry(256, 128, 'TL');
         const tex = DataManager.getTexture("level1");
+        const geo = new SpriteGeometry(tex.width, tex.height, 'TL');
         const mat = new SpriteMaterial(tex);
         const inst = new Instance(geo, mat);
 
@@ -53,6 +62,7 @@ class Level1 {
     private _populate(): void {
         const gunman = CharactersManager.createGunman();
         this._scene.addInstance(gunman);
+        this._player = gunman;
 
         const civ = CharactersManager.createCivilian();
         civ.position.x = 80;
@@ -61,10 +71,14 @@ class Level1 {
     }
 
     public init(): void {
+        this._camera.init();
+        
         this._scene.init();
     }
 
     public render(renderer: Renderer): void {
+        this._camera.update();
+
         this._scene.render(renderer, this._camera);
     }
 }
