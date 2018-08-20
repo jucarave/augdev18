@@ -13,6 +13,7 @@ class InventoryComponent extends Component {
     private _invInst                    : Instance;
     private _labels                     : Array<Text>;
     private _cursor                     : Instance;
+    private _cursorSlot                 : number;
     private _characterComponent         : CharacterComponent;
 
     public keys = {
@@ -56,6 +57,8 @@ class InventoryComponent extends Component {
         this._scene.addInstance(this._cursor, 2);
 
         this._cursor.position.add(-56, 32, 0);
+
+        this._cursorSlot = 0;
     }
 
     private _createInventoryInstance(): void {
@@ -94,13 +97,19 @@ class InventoryComponent extends Component {
         }
     }
 
-    public init(scene: Scene): void {
-        this._scene = scene;
+    private _updateActions(): void {
+        if (this.keys.DOWN == 1) {
+            this._cursorSlot += 1;
+            this.keys.DOWN = 2;
+        } else if (this.keys.UP == 1) {
+            this._cursorSlot -= 1;
+            this.keys.UP = 2;
+        }
 
-        this._characterComponent = this._instance.getComponent<CharacterComponent>(CharacterComponent.COMPONENT_NAME);
+        if (this._cursorSlot < 0) { this._cursorSlot = this._characterComponent.weapons.length; }
+        if (this._cursorSlot >= this._characterComponent.weapons.length + 1) { this._cursorSlot = 0; }
 
-        this._createInventoryInstance();
-        this._createCursor();
+        this._cursor.position.set(-56, 32 - this._cursorSlot * 6, 0);
     }
 
     public switchInventory(): void {
@@ -112,6 +121,19 @@ class InventoryComponent extends Component {
         if (this._invInst.visible) {
             this._updateTextLabels();
         }
+    }
+
+    public init(scene: Scene): void {
+        this._scene = scene;
+
+        this._characterComponent = this._instance.getComponent<CharacterComponent>(CharacterComponent.COMPONENT_NAME);
+
+        this._createInventoryInstance();
+        this._createCursor();
+    }
+
+    public update(): void {
+        this._updateActions();
     }
 
     public get isOpen(): boolean {
