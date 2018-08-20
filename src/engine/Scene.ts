@@ -4,25 +4,31 @@ import Camera from "./entities/Camera";
 import List from "./List";
 
 class Scene {
-    private _instances           : List<Instance>;
+    private _instances           : Array<List<Instance>>;
+    private _cameras             : Array<Camera>;
 
     public beforeRender          : Function;
 
     constructor() {
-        this._instances = new List();
+        this._instances = [];
+        this._cameras = [];
 
         this.beforeRender = null;
     }
 
-    public addInstance(instance: Instance): Scene {
-        this._instances.push(instance);
+    public addInstance(instance: Instance, layer: number = 1): Scene {
+        if (!this._instances[layer]) {
+            this._instances[layer] = new List();
+        }
+
+        this._instances[layer].push(instance);
         instance.setScene(this);
 
         return this;
     }
 
-    public getCollision(instance: Instance): Instance {
-        let node = this._instances.head;
+    public getCollision(instance: Instance, layer: number = 1): Instance {
+        let node = this._instances[layer].head;
 
         while (node) {
             const inst: Instance = node.item;
@@ -36,33 +42,57 @@ class Scene {
         return null;
     }
 
+    public addCamera(index: number, camera: Camera): void {
+        this._cameras[index] = camera;
+    }
+
+    public getCamera(index: number): Camera {
+        return this._cameras[index];
+    }
+
     public init(): Scene {
-        this._instances.each((ins: Instance) => {
-            ins.init();
-        });
+        for (let i=0;i<this._instances.length;i++) {
+            const layer = this._instances[i];
+            if (!layer) { continue; }
+            
+            layer.each((ins: Instance) => {
+                ins.init();
+            });
+        }
 
         return this;
     }
 
     public render(renderer: Renderer, camera: Camera): Scene {
-        let renderInst = this._instances;
+        let renderInst: List<Instance> = null;
 
-        this._instances.each((ins: Instance) => {
-            ins.update();
-        });
+        for (let i=0;i<this._instances.length;i++) {
+            const layer = this._instances[i];
+            if (!layer) { continue; }
 
-        if (this.beforeRender !== null) {
-            renderInst = this.beforeRender(this._instances);
+            layer.each((ins: Instance) => {
+                ins.update();
+            });
         }
 
-        this._instances.each((ins: Instance) => {
-            if (ins.isDestroyed) {
-                renderInst.remove(ins);
-                return;
-            }
+        for (let i=0;i<this._instances.length;i++) {
+            let layer = this._instances[i];
+            if (!layer) { continue; }
 
-            ins.render(renderer, camera);
-        });
+            if (this.beforeRender !== null) {
+                layer = this.beforeRender(layer, i);
+            } 
+
+            layer.each((ins: Instance) => {
+                if (ins.isDestroyed) {
+                    renderInst.remove(ins);
+                    return;
+                }
+    
+                ins.render(renderer, camera);
+            });
+        
+        }
 
         return this;
     }

@@ -16,6 +16,16 @@ export function degToRad(degrees: number): number {
     return degrees * Math.PI / 180;
 }
 
+export function roundUpPowerOf2(x: number): number {
+    let ret = 2;
+
+    while (ret < x) {
+        ret *= 2;
+    }
+
+    return ret;
+}
+
 export function httpRequest(url: string, callback: Function): void {
     let http = new XMLHttpRequest();
 
@@ -46,3 +56,5 @@ export function waitTexturesToLoad(textures: Array<Texture>, callback: Function)
 
     callback();
 }
+
+export type Pivot = 'TL' | 'TM' | 'TR' | 'ML' | 'M' | 'MR' | 'BL' | 'BM' | 'BR';

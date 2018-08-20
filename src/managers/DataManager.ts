@@ -37,15 +37,19 @@ class DataManager {
         }
     };
 
+    private _loadTexture(url: string): void {
+        const tex = new Texture(url);
+
+        const spriteCode = url.replace("img/", "").replace(".png", "");
+
+        this._texturesByCode[spriteCode] = this._textures.length;
+        this._textures.push(tex);
+        this._loadedSprites.push(url);
+    }
+
     private _parseLevels(levelData: any): void {
         for (let i of levelData) {
-            const tex = new Texture(i);
-
-            const spriteCode = i.replace("img/", "").replace(".png", "");
-
-            this._texturesByCode[spriteCode] = this._textures.length;
-            this._textures.push(tex);
-            this._loadedSprites.push(i);
+            this._loadTexture(i);
         }
     }
 
@@ -56,6 +60,7 @@ class DataManager {
             this._textures = [];
 
             this._parseLevels(data.levels);
+            this._loadTexture(data.ui);
 
             for (let i in charactersData) {
 

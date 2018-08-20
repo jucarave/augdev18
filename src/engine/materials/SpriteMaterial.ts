@@ -95,6 +95,10 @@ class SpriteMaterial extends Material {
         this._uvs = uvs;
     }
 
+    public set texture(texture: Texture) {
+        this._texture = texture;
+    }
+
     public get isReady(): boolean {
         return true;
     }

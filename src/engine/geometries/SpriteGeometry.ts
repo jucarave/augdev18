@@ -1,6 +1,5 @@
 import Geometry from './Geometry';
-
-type Pivot = 'TL' | 'TM' | 'TR' | 'ML' | 'M' | 'MR' | 'BL' | 'BM' | 'BR';
+import { Pivot } from '../Utils';
 
 class SpriteGeometry extends Geometry {
     constructor(width: number, height: number, pivot: Pivot = 'M') {

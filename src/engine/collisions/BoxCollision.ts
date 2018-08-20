@@ -1,7 +1,5 @@
 import Instance from "../entities/Instance";
-import { createUUID } from "../Utils";
-
-type Pivot = 'TL' | 'TM' | 'TR' | 'ML' | 'M' | 'MR' | 'BL' | 'BM' | 'BR';
+import { createUUID, Pivot } from "../Utils";
 
 class BoxCollision {
     public readonly id              : string;

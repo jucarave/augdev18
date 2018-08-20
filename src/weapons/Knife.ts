@@ -8,7 +8,7 @@ class Knife extends Weapon {
     private _bullet             : Instance;
 
     constructor() {
-        super();
+        super("Knife");
 
         this._bullet = new Instance(null, null);
         this._bullet.collision = new BoxCollision(this._bullet, 3, 3);

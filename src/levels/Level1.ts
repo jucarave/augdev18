@@ -17,13 +17,16 @@ class Level1 {
         this._scene = new Scene();
         this._camera = Camera.createOrthographic(192, 108, 0.1, 100.0);
 
-        this._camera.position.set(0, 0, 10);
+        this._camera.position.set(96, 54, 10);
         this._camera.rotation.lookToDirection(new Vector3(0, 0, -10.0));
+
+        this._scene.addCamera(0, this._camera);
 
         this._buildLevelGeometry();
         this._populate();
 
-        this._scene.beforeRender = (instances: List<Instance>) => {
+        this._scene.beforeRender = (instances: List<Instance>, layer: number) => {
+            if (layer != 1) { return instances; }
             
             instances.sort((insA: Instance, insB: Instance) => {
                 const depthA = insA.globalPosition,
@@ -44,7 +47,7 @@ class Level1 {
 
         inst.position.y = 128;
 
-        this._scene.addInstance(inst);
+        this._scene.addInstance(inst, 0);
     }
 
     private _populate(): void {

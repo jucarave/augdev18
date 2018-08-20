@@ -4,7 +4,7 @@ import {createUUID } from './Utils';
 import Animation2D from './Animation2D';
 
 interface RendererTextureMap {
-    [index: string]             : WebGLTexture;
+    [index: string]             : { texture: WebGLTexture, gl: WebGLRenderingContext };
 }
 
 interface AnimationMap {
@@ -64,10 +64,13 @@ class Texture {
         const gl = renderer.GL;
 
         if (!this._textureMap[renderer.id]) {
-            this._textureMap[renderer.id] = gl.createTexture();
+            this._textureMap[renderer.id] = {
+                gl: gl,
+                texture: gl.createTexture()
+            };
         }
 
-        const texture = this._textureMap[renderer.id];
+        const texture = this._textureMap[renderer.id].texture;
 
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._canvas || this._img || this._imageData);
@@ -101,7 +104,7 @@ class Texture {
             this._parseTexture(renderer);
         }
 
-        return this._textureMap[renderer.id];
+        return this._textureMap[renderer.id].texture;
     }
 
     public plotPixel(x: number, y: number, color: Vector4): Texture {
@@ -128,6 +131,22 @@ class Texture {
         if (!this._animations[code]) { throw new Error("Animation [" + code + "] not found!"); }
 
         return this._animations[code];
+    }
+
+    public destroy(): void {
+        for (let i in this._textureMap) {
+            const texture = this._textureMap[i],
+                gl = texture.gl;
+
+            gl.deleteTexture(texture.texture);
+        }
+
+        this._textureMap = null;
+        this._canvas = null;
+        this._img = null;
+        this._src = null;
+        this._imageData = null;
+        this._animations = null;
     }
 
     public get isReady(): boolean {

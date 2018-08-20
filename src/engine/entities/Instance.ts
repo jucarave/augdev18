@@ -23,8 +23,8 @@ class Instance {
     protected _globalPosition     : Vector4;
     protected _components         : Array<Component>;
     protected _scene              : Scene;
-
-    public visible                : boolean;
+    protected _visible            : boolean;
+    
     public collision              : BoxCollision;
 
     public readonly id                  : string;
@@ -220,6 +220,18 @@ class Instance {
         if (!this._parent) { return this.rotation; }
 
         return this.rotation.clone().multiplyQuaternion(this._parent.globalRotation);
+    }
+
+    public set visible(visible: boolean) {
+        this._visible = visible;
+    }
+
+    public get visible(): boolean {
+        if (this._parent) {
+            return this._visible && this._parent.visible;
+        } else {
+            return this._visible;
+        }
     }
 
     public emmitNeedsUpdate(): void {
