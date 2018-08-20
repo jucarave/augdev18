@@ -110,6 +110,19 @@ class InventoryComponent extends Component {
         if (this._cursorSlot >= this._characterComponent.weapons.length + 1) { this._cursorSlot = 0; }
 
         this._cursor.position.set(-56, 32 - this._cursorSlot * 6, 0);
+
+        // Select weapon
+
+        if (this.keys.ATTACK == 1) {
+            if (this._cursorSlot == 0) {
+                this._characterComponent.equipWeapon(null);
+            } else {
+                this._characterComponent.equipWeapon(this._characterComponent.weapons[this._cursorSlot - 1]);
+            }
+
+            this.switchInventory();
+            this.keys.ATTACK = 0;
+        }
     }
 
     public switchInventory(): void {
