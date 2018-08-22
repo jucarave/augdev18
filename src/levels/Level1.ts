@@ -21,6 +21,7 @@ class Level1 {
         this._buildLevelGeometry();
         this._populate();
         this._createCamera();
+        this._loadCollisions();
 
         this._scene.beforeRender = (instances: List<Instance>, layer: number) => {
             if (layer != 1) { return instances; }
@@ -34,6 +35,12 @@ class Level1 {
 
             return instances;
         };
+    }
+
+    private _loadCollisions(): void {
+        const collisions = DataManager.getCollisions("level_1");
+
+        this._scene.setLevelCollisions(collisions);
     }
 
     private _createCamera(): void {
@@ -54,13 +61,14 @@ class Level1 {
         const mat = new SpriteMaterial(tex);
         const inst = new Instance(geo, mat);
 
-        inst.position.y = 128;
+        inst.position.y = tex.height;
 
         this._scene.addInstance(inst, 0);
     }
 
     private _populate(): void {
         const gunman = CharactersManager.createGunman();
+        gunman.position.set(135, 489, 0);
         this._scene.addInstance(gunman);
         this._player = gunman;
 

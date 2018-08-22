@@ -5,14 +5,20 @@ interface TexturesMap {
     [index: string]             : number;
 }
 
+interface CollisionsMap {
+    [index: string]             : Array<Array<number>>;
+}
+
 class DataManager {
     private _textures           : Array<Texture>;
     private _texturesByCode     : TexturesMap;
     private _loadedSprites      : Array<string>;
+    private _collisions         : CollisionsMap;
 
     constructor() {
         this._textures = [];
         this._texturesByCode = {};
+        this._collisions = {};
     }
 
     private _parseAnimations(tex: Texture, code: string, animationsData: any) {
@@ -48,8 +54,11 @@ class DataManager {
     }
 
     private _parseLevels(levelData: any): void {
-        for (let i of levelData) {
-            this._loadTexture(i);
+        for (let i in levelData) {
+            const level = levelData[i];
+            this._loadTexture(level.img);
+
+            this._collisions[i] = level.collisions;
         }
     }
 
@@ -98,6 +107,10 @@ class DataManager {
         if (this._texturesByCode[code] === undefined) { throw new Error("Texture [" + code + "] not found!"); }
 
         return this._textures[this._texturesByCode[code]];
+    }
+
+    public getCollisions(code: string): Array<Array<number>> {
+        return this._collisions[code];
     }
 }
 

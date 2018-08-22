@@ -90,7 +90,7 @@ class CharacterComponent extends Component {
         }
 
         this._instance.position.add(x, y, 0);
-        if (this._scene.getCollision(this._instance)) {
+        if (this._scene.getCollision(this._instance) || this._scene.collidesWithLevel(this._instance)) {
             this._instance.position.add(-x, -y, 0);
             this._action = "stand";
         }

@@ -6,12 +6,14 @@ import List from "./List";
 class Scene {
     private _instances           : Array<List<Instance>>;
     private _cameras             : Array<Camera>;
+    private _levelCollisions     : Array<Array<number>>;
 
     public beforeRender          : Function;
 
     constructor() {
         this._instances = [];
         this._cameras = [];
+        this._levelCollisions = null;
 
         this.beforeRender = null;
     }
@@ -25,6 +27,22 @@ class Scene {
         instance.setScene(this);
 
         return this;
+    }
+
+    public setLevelCollisions(collisions: Array<Array<number>>): Scene {
+        this._levelCollisions = collisions;
+
+        return this;
+    }
+
+    public collidesWithLevel(instance: Instance): boolean {
+        for (let i=0,col:Array<number>;col=this._levelCollisions[i];i++) {
+            if (instance.collision.overlapsArray(col)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public getCollision(instance: Instance, layer: number = 1): Instance {
